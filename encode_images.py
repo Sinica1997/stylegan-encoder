@@ -144,7 +144,7 @@ def main():
             model_file = open(model_file[0], "rb")
         else:
             raise Exception('Failed to find the model')
-        generator_network, discriminator_network, Gs_network = pickle.load(model_file)
+        perc_model = pickle.load(model_file)
 
         
     perceptual_model = PerceptualModel(args, perc_model=perc_model, batch_size=args.batch_size)
