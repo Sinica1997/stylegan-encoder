@@ -125,15 +125,27 @@ def main():
         raise Exception('Failed to find the model')
     generator_network, discriminator_network, Gs_network = pickle.load(model_file)
 
-    
+
     generator = Generator(Gs_network, args.batch_size, clipping_threshold=args.clipping_threshold, tiled_dlatent=args.tile_dlatents, model_res=args.model_res, randomize_noise=args.randomize_noise)
     if (args.dlatent_avg != ''):
         generator.set_dlatent_avg(np.load(args.dlatent_avg))
 
     perc_model = None
     if (args.use_lpips_loss > 0.00000001):
+        '''
         with dnnlib.util.open_url('https://drive.google.com/uc?id=1N2-m9qszOeVC9Tq77WxsLnuWwOedQiD2', cache_dir=config.cache_dir) as f:
             perc_model =  pickle.load(f)
+        '''
+
+        # 加载VGG16 perceptual模型
+        Model = './models/vgg16_zhang_perceptual.pkl'
+        model_file = glob.glob(Model)
+        if len(model_file) == 1:
+            model_file = open(model_file[0], "rb")
+        else:
+            raise Exception('Failed to find the model')
+        perc_model = pickle.load(model_file)
+        
     perceptual_model = PerceptualModel(args, perc_model=perc_model, batch_size=args.batch_size)
     perceptual_model.build_perceptual_model(generator, discriminator_network)
 
