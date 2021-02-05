@@ -118,12 +118,8 @@ def main():
     '''
     # 加载StyleGAN模型
     Model = './models/karras2019stylegan-ffhq-1024x1024.pkl'
-    model_file = glob.glob(Model)
-    if len(model_file) == 1:
-        model_file = open(model_file[0], "rb")
-    else:
-        raise Exception('Failed to find the model')
-    generator_network, discriminator_network, Gs_network = pickle.load(model_file)
+    with open(Model,'rb') as f:
+        generator_network, discriminator_network, Gs_network = pickle.load(f)
 
 
     generator = Generator(Gs_network, args.batch_size, clipping_threshold=args.clipping_threshold, tiled_dlatent=args.tile_dlatents, model_res=args.model_res, randomize_noise=args.randomize_noise)
@@ -139,12 +135,8 @@ def main():
 
         # 加载VGG16 perceptual模型
         Model = './models/vgg16_zhang_perceptual.pkl'
-        model_file = glob.glob(Model)
-        if len(model_file) == 1:
-            model_file = open(model_file[0], "rb")
-        else:
-            raise Exception('Failed to find the model')
-        perc_model = pickle.load(model_file)
+        with open(Model,'rb') as f:
+            perc_model = pickle.load(f)
         
     perceptual_model = PerceptualModel(args, perc_model=perc_model, batch_size=args.batch_size)
     perceptual_model.build_perceptual_model(generator, discriminator_network)
