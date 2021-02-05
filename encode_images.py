@@ -13,6 +13,7 @@ from encoder.perceptual_model import PerceptualModel, load_images
 #from tensorflow.keras.models import load_model
 from keras.models import load_model
 from keras.applications.resnet50 import preprocess_input
+import glob
 
 def split_to_batches(l, n):
     for i in range(0, len(l), n):
@@ -118,9 +119,12 @@ def main():
     '''
     # 加载StyleGAN模型
     Model = './models/karras2019stylegan-ffhq-1024x1024.pkl'
-    with open(Model,'rb') as f:
-        generator_network, discriminator_network, Gs_network = pickle.load(f)
-
+    model_file = glob.glob(Model)
+    if len(model_file) == 1:
+        model_file = open(model_file[0], "rb")
+    else:
+        raise Exception('Failed to find the model')
+    generator_network, discriminator_network, Gs_network = pickle.load(model_file)
 
     generator = Generator(Gs_network, args.batch_size, clipping_threshold=args.clipping_threshold, tiled_dlatent=args.tile_dlatents, model_res=args.model_res, randomize_noise=args.randomize_noise)
     if (args.dlatent_avg != ''):
@@ -132,11 +136,16 @@ def main():
         with dnnlib.util.open_url('https://drive.google.com/uc?id=1N2-m9qszOeVC9Tq77WxsLnuWwOedQiD2', cache_dir=config.cache_dir) as f:
             perc_model =  pickle.load(f)
         '''
-
+        
         # 加载VGG16 perceptual模型
         Model = './models/vgg16_zhang_perceptual.pkl'
-        with open(Model,'rb') as f:
-            perc_model = pickle.load(f)
+        model_file = glob.glob(Model)
+        if len(model_file) == 1:
+            model_file = open(model_file[0], "rb")
+        else:
+            raise Exception('Failed to find the model')
+        generator_network, discriminator_network, Gs_network = pickle.load(model_file)
+
         
     perceptual_model = PerceptualModel(args, perc_model=perc_model, batch_size=args.batch_size)
     perceptual_model.build_perceptual_model(generator, discriminator_network)
