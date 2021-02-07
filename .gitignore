@@ -2,4 +2,8 @@
 models/
 # resent.h5
 data/
-
+# others
+.DS_store
+# cache
+__pycache__
+.ipynb_checkpoints
